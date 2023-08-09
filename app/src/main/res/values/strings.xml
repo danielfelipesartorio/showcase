@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Showcase</string>
+    <string name="title_activity_weather">WeatherActivity</string>
+    <string name="title_activity_calculator">CalculatorActivity</string>
+</resources>
