@@ -9,14 +9,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -40,15 +35,17 @@ class CalculatorActivity : ComponentActivity() {
             ShowcaseTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
-                    modifier = Modifier.fillMaxSize().padding(16.dp),
-                    color = MaterialTheme.colorScheme.background
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    color = MaterialTheme.colorScheme.background,
                 ) {
                     val viewModel = viewModel<CalculatorViewModel>()
                     val state = viewModel.state
 
                     Column(modifier = Modifier.fillMaxWidth()) {
-                        Display(state)
-                        Buttons {
+                        Display(modifier = Modifier.weight(1f), state = state)
+                        Buttons(modifier = Modifier.weight(1f)) {
                             viewModel.onAction(it)
                         }
                     }
@@ -59,11 +56,12 @@ class CalculatorActivity : ComponentActivity() {
 }
 
 @Composable
-fun Display(state: CalculatorState) {
+fun Display(state: CalculatorState, modifier: Modifier = Modifier) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(16.dp)
+            .then(modifier),
         contentAlignment = Alignment.BottomEnd
     ) {
         Column {
@@ -75,7 +73,8 @@ fun Display(state: CalculatorState) {
             Text(
                 text = state.number1 + (state.operation?.symbol ?: "") + state.number2,
                 style = MaterialTheme.typography.displayLarge,
-                textAlign = TextAlign.End
+                textAlign = TextAlign.End,
+                maxLines = 2
             )
         }
 
@@ -83,10 +82,13 @@ fun Display(state: CalculatorState) {
 }
 
 @Composable
-fun Buttons(onAction: (CalculatorAction) -> Unit) {
-    val buttonSpacing: Dp =8.dp
+fun Buttons(modifier: Modifier = Modifier, onAction: (CalculatorAction) -> Unit) {
+    val buttonSpacing: Dp = 8.dp
 
-    Row {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(buttonSpacing),
+        modifier = modifier
+    ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(buttonSpacing),
             modifier = Modifier.weight(3f)
@@ -168,31 +170,31 @@ fun Buttons(onAction: (CalculatorAction) -> Unit) {
                 label = "+",
                 action = CalculatorAction.Operation(CalculatorOperation.Add),
                 onClick = onAction,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.fillMaxWidth()
             )
             CalculatorButton(
                 label = "-",
                 action = CalculatorAction.Operation(CalculatorOperation.Subtract),
                 onClick = onAction,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.fillMaxWidth()
             )
             CalculatorButton(
                 label = "x",
                 action = CalculatorAction.Operation(CalculatorOperation.Multiply),
                 onClick = onAction,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.fillMaxWidth()
             )
             CalculatorButton(
                 label = "/",
                 action = CalculatorAction.Operation(CalculatorOperation.Divide),
                 onClick = onAction,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.fillMaxWidth()
             )
             CalculatorButton(
                 label = "=",
                 action = CalculatorAction.Calculate,
                 onClick = onAction,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.fillMaxWidth()
             )
 
         }
@@ -203,5 +205,8 @@ fun Buttons(onAction: (CalculatorAction) -> Unit) {
 @Preview
 @Composable
 fun Preview() {
-    Buttons(onAction = {})
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Display(CalculatorState("1", "2", CalculatorOperation.Add, "1+2="))
+        Buttons {}
+    }
 }
